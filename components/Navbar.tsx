@@ -21,13 +21,23 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
 
-  // Lock body scroll when menu is open
+  // Lock body scroll when menu is open (iOS Safari fix)
   useEffect(() => {
+    const htmlEl = document.documentElement;
     if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      htmlEl.style.position = 'fixed';
+      htmlEl.style.width = '100%';
+      htmlEl.style.top = '0';
     } else {
-      document.body.style.overflow = 'unset';
+      htmlEl.style.position = '';
+      htmlEl.style.width = '';
+      htmlEl.style.top = '';
     }
+    return () => {
+      htmlEl.style.position = '';
+      htmlEl.style.width = '';
+      htmlEl.style.top = '';
+    };
   }, [isMobileMenuOpen]);
 
   // If in Admin mode, standard navbar logic might vary, 
@@ -44,7 +54,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
 
   return (
     <>
-      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ease-in-out border-b ${
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out border-b ${
         isScrolled || isMobileMenuOpen
           ? 'bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg border-white/10 dark:border-white/5 py-3 shadow-sm' 
           : 'bg-transparent border-transparent py-6'
